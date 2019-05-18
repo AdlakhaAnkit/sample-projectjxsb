@@ -1,0 +1,30 @@
+apiVersion: skaffold/v1beta2
+kind: Config
+build:
+  artifacts:
+  - image: changeme
+    context: .
+    docker: {}
+  tagPolicy:
+    envTemplate:
+      template: '{{.DOCKER_REGISTRY}}/adlakhaankit/sample-projectjxsb:{{.VERSION}}'
+  local: {}
+deploy:
+  kubectl: {}
+profiles:
+- name: dev
+  build:
+    artifacts:
+    - docker: {}
+    tagPolicy:
+      envTemplate:
+        template: '{{.DOCKER_REGISTRY}}/adlakhaankit/sample-projectjxsb:{{.DIGEST_HEX}}'
+    local: {}
+  deploy:
+    helm:
+      releases:
+      - name: sample-projectjxsb
+        chartPath: charts/sample-projectjxsb
+        setValueTemplates:
+          image.repository: '{{.DOCKER_REGISTRY}}/adlakhaankit/sample-projectjxsb'
+          image.tag: '{{.DIGEST_HEX}}'
